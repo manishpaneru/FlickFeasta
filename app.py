@@ -35,7 +35,7 @@ st.markdown(
 st.header('FlickFeasta')
 
 # Load pickled files
-movies = pd.read_pickle('model/movie_list.pkl')
+movies = pd.read_pickle('movie_list.pkl')
 similarity = pd.read_pickle('model/similarity.pkl')
 
 # Add more vertical spacing
