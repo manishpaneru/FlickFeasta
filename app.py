@@ -1,17 +1,27 @@
 import streamlit as st
 import requests
 import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
+# Function to fetch poster URL
 def fetch_poster(movie_id):
     url = "https://api.themoviedb.org/3/movie/{}?api_key=8265bd1679663a7ea12ac168da84d2e8&language=en-US".format(movie_id)
-    data = requests.get(url)
-    data = data.json()
+    data = requests.get(url).json()
     poster_path = data['poster_path']
     full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
     return full_path
 
-def recommend(movie, movies, similarity):
+# Function to calculate similarity dynamically
+def calculate_similarity(movies):
+    tags = movies['tags']
+    vectors = cv.fit_transform(tags).toarray()
+    return cosine_similarity(vectors)
+
+# Function to recommend movies
+def recommend(movie, movies):
     index = movies[movies['title'] == movie].index[0]
+    similarity = calculate_similarity(movies)
     distances = sorted(list(enumerate(similarity[index])), reverse=True, key=lambda x: x[1])
     recommended_movies = []
     for i in distances[1:6]:
@@ -36,7 +46,9 @@ st.header('FlickFeasta')
 
 # Load pickled files
 movies = pd.read_pickle('movie_list.pkl')
-similarity = pd.read_pickle('similarity.pkl')
+
+# Initialize CountVectorizer
+cv = CountVectorizer(max_features=5000, stop_words='english')
 
 # Add more vertical spacing
 st.write("\n\n\n\n\n")  
@@ -48,7 +60,7 @@ selected_movie = st.selectbox(
 )
 
 if st.button('Show Recommendation'):
-    recommended_movies = recommend(selected_movie, movies, similarity)
+    recommended_movies = recommend(selected_movie, movies)
     cols = st.columns(5)
     for i, movie in enumerate(recommended_movies):
         with cols[i]:
