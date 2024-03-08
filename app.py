@@ -43,6 +43,7 @@ st.markdown(
 )
 
 st.header('FlickFeasta')
+st.write("by Manish Paneru")  # Added aesthetic change
 
 # Load pickled files
 movies = pd.read_pickle('movie_list.pkl')
